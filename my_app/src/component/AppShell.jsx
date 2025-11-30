@@ -12,7 +12,7 @@ import { AllEmployeesAttendance } from './AllEmployeesAttendance';
 import { Profile } from './Profile';
 import TeamCalendar from './TeamCalendar';
 import ManagerReports from './ManagerReports';
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_BASE = process.env.REACT_APP_API_URL || 'https://tap-academy-o1jz.onrender.com';
 
 const apiRequest = async (path, options = {}) => {
   const token = localStorage.getItem('token');
