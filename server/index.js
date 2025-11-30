@@ -15,7 +15,7 @@ app.use(express.json());
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://tap-academy-mu.vercel.app/',
     credentials: true
 }));
 app.use(cookieParser());
