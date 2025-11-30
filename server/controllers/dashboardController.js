@@ -16,12 +16,10 @@ export const getEmployeeStats = async (req, res) => {
             userId,
             date: { $gte: startMonth, $lte: endMonth }
         });
-
         const present = monthlyAttendance.filter(a => a.status === 'present').length;
         const late = monthlyAttendance.filter(a => a.status === 'late').length;
         const halfDay = monthlyAttendance.filter(a => a.status === 'half-day').length;
-        const absent = monthlyAttendance.filter(a => a.status === 'absent').length; // Note: Absent usually needs to be calculated against working days, but for now we count explicit absent records if any, or just rely on present/late counts. The prompt implies counting days.
-        // For simplicity, we'll just return the counts of records we have.
+        const absent = monthlyAttendance.filter(a => a.status === 'absent').length;
 
         const totalHours = monthlyAttendance.reduce((acc, curr) => acc + (curr.totalHours || 0), 0);
 
@@ -47,18 +45,13 @@ export const getManagerStats = async (req, res) => {
         const today = new Date();
         const start = startOfDay(today);
         const end = endOfDay(today);
-
         const todayAttendance = await Attendance.find({
             date: { $gte: start, $lte: end }
         });
-
         const presentCount = todayAttendance.length;
         const lateCount = todayAttendance.filter(a => a.status === 'late').length;
         const absentCount = totalEmployees - presentCount;
-
-        // Calculate weekly stats (last 7 days)
         const weeklyStats = [];
-
         for (let i = 6; i >= 0; i--) {
             const date = subDays(today, i);
             const dayStart = startOfDay(date);
@@ -67,15 +60,11 @@ export const getManagerStats = async (req, res) => {
             const dayAttendance = await Attendance.find({
                 date: { $gte: dayStart, $lte: dayEnd }
             });
-
             const dayPresent = dayAttendance.filter(a => a.status === 'present' || a.status === 'half-day').length;
             const dayLate = dayAttendance.filter(a => a.status === 'late').length;
-            // Assuming absent is total - (present + late)
-            // Note: This is a simplification. Real systems would check working days, holidays, etc.
             const dayAbsent = Math.max(0, totalEmployees - (dayPresent + dayLate));
-
             weeklyStats.push({
-                name: format(date, 'EEE'), // Mon, Tue, etc.
+                name: format(date, 'EEE'), 
                 present: dayPresent,
                 late: dayLate,
                 absent: dayAbsent
